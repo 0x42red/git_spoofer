@@ -23,7 +23,7 @@ fn main() -> Result<(), reqwest::Error> {
     if let Some((username, email)) = get_username_email(username)? {
         eprintln!("Found: {username} {email}");
         if args.commit {
-            eprintln!("Applying to gitcommit amend");
+            eprintln!("Applying to git commit amend");
             let repo = match Repository::open(".") {
                 Ok(repo) => repo,
                 Err(e) => panic!("failed to init: {}", e),
