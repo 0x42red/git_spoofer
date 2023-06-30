@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use clap::Parser;
 use git2::Repository;
 use git2::Signature;
