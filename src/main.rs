@@ -1,6 +1,8 @@
-use std::str::FromStr;
+use std::error::Error;
 
 use clap::Parser;
+use git2::Repository;
+use git2::Signature;
 use reqwest;
 use serde_json::Value;
 
@@ -20,15 +22,24 @@ fn main() -> Result<(), reqwest::Error> {
     let username = args.username.to_uppercase();
     let username = username.as_str();
 
-    // if let Some((username, email)) = get_username_email(username)? {
-    //     eprintln!("Found: {username} {email}");
-    //
-    // }
-    let username = String::from("hoopla");
-    let email = String::from("foo@bar.com");
-    if args.commit {
-        eprintln!("Applying to gitcommit ammend");
-        eprintln!("{} {}", username.as_str(), email.as_str());
+    if let Some((username, email)) = get_username_email(username)? {
+        eprintln!("Found: {username} {email}");
+        if args.commit {
+            eprintln!("Applying to gitcommit amend");
+            let repo = match Repository::open(".") {
+                Ok(repo) => repo,
+                Err(e) => panic!("failed to init: {}", e),
+            };
+            let head = repo.head().unwrap();
+            let oid = head.target().unwrap();
+            let commit = repo.find_commit(oid).unwrap();
+            let sig = Signature::now(username.as_str(), email.as_str()).unwrap();
+            commit
+                .amend(Some("HEAD"), Some(&sig), None, None, None, None)
+                .unwrap();
+        }
+    } else {
+        eprint!("Couldn't find users email address");
     }
 
     Ok(())
