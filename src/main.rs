@@ -33,7 +33,7 @@ fn main() -> Result<(), reqwest::Error> {
             let commit = repo.find_commit(oid).unwrap();
             let sig = Signature::now(username.as_str(), email.as_str()).unwrap();
             commit
-                .amend(Some("HEAD"), Some(&sig), None, None, None, None)
+                .amend(Some("HEAD"), Some(&sig), Some(&sig), None, None, None)
                 .unwrap();
         }
     } else {
