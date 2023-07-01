@@ -8,6 +8,8 @@ A malicious user can use typo squatting mixed with this unverified attack to tri
 
 This would be a significantly smaller problem if Github didn't take unverified commits and add them to your contributors list.
 This combined with linking to official profiles under the github log allows for a convincing ruse.
+![List of spoofed commits](https://github.com/0x42red/git_spoofer/blob/main/commits.png?raw=true)
+![List of spoofed contributors](https://github.com/0x42red/git_spoofer/blob/main/contrib.png?raw=true)
 
 # What about verified commits
 Yes you can PGP sign your commits.  Which is great but all it does is give you a green badge.  This is an anti-pattern, similar to when HTTP was grey and HTTPS was green.
