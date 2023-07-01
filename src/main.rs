@@ -1,6 +1,5 @@
 use clap::Parser;
-use git2::Repository;
-use git2::Signature;
+use git2::{Repository, Signature};
 use reqwest;
 use serde_json::Value;
 
@@ -23,23 +22,36 @@ fn main() -> Result<(), reqwest::Error> {
     if let Some((username, email)) = get_username_email(username)? {
         eprintln!("Found: {username} {email}");
         if args.commit {
-            eprintln!("Applying to git commit amend");
-            let repo = match Repository::open(".") {
-                Ok(repo) => repo,
-                Err(e) => panic!("failed to init: {}", e),
+            eprintln!("Amending author...");
+            let sig = Signature::now(username.as_str(), email.as_str())
+                .expect("Unable to build signature");
+            match amend_commit(sig) {
+                Ok(_) => eprintln!("Complete"),
+                Err(e) => eprintln!("Unable to amend commit: {:?}", e),
             };
-            let head = repo.head().unwrap();
-            let oid = head.target().unwrap();
-            let commit = repo.find_commit(oid).unwrap();
-            let sig = Signature::now(username.as_str(), email.as_str()).unwrap();
-            commit
-                .amend(Some("HEAD"), Some(&sig), Some(&sig), None, None, None)
-                .unwrap();
         }
     } else {
         eprint!("Couldn't find users email address");
     }
 
+    Ok(())
+}
+
+fn amend_commit(signature: Signature) -> Result<(), git2::Error> {
+    let repo = Repository::open(".")?;
+    let head = repo.head()?;
+    let oid = head
+        .target()
+        .ok_or(git2::Error::from_str("Unable to find repo reference"))?;
+    let commit = repo.find_commit(oid)?;
+    commit.amend(
+        Some("HEAD"),
+        Some(&signature),
+        Some(&signature),
+        None,
+        None,
+        None,
+    )?;
     Ok(())
 }
 
